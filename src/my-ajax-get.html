@@ -1,0 +1,81 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="myajax-get">
+  <template>
+  Hello World
+ <iron-ajax id="getajax" auto url="http://localhost:3000/posts/" handle-as="json" last-response="{{posts}}"></iron-ajax>
+ <iron-ajax
+           id="postajax"
+           method="POST"
+           contentType="application/json"
+           url="http://localhost:3000/posts/"
+           body='{"title":{{title}}, "author": {{author}}}'
+           handle-as="json"
+           on-response="responseHandler">
+</iron-ajax>
+<paper-input label="Title" bind-value={{title}}></paper-input>
+<paper-input label="Author" bind-value={{author}}></paper-input>
+<paper-button on-tap="addPost" text="Add Post">Add Post</paper-button>
+ <vaadin-grid aria-label="Remote Data Example" items="[[posts]]">
+
+   <vaadin-grid-column width="50px" flex-grow="0">
+     <template class="header">#</template>
+     <template>[[index]]</template>
+   </vaadin-grid-column>
+
+   <vaadin-grid-column>
+     <template class="header">Title</template>
+     <template>[[item.title]]</template>
+   </vaadin-grid-column>
+
+   <vaadin-grid-column>
+     <template class="header">Author</template>
+     <template>[[item.author]]</template>
+   </vaadin-grid-column>
+
+ </vaadin-grid>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'myajax-get',
+      properties:{
+        title:{
+          type:String,
+          notify:true
+        },
+        author:{
+          type:String,
+          notify:true
+        }
+      },
+      addPost:function(){
+        this.$.postajax.generateRequest();
+      },
+      responseHandler:function(){
+      console.log('Hello generate'+this.title+' and '+this.author)
+        this.$.getajax.generateRequest();
+        this.title="";
+        this.author="";
+      }
+
+    });
+  </script>
+</dom-module>

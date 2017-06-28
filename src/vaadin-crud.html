@@ -1,0 +1,135 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="vaadin-crud">
+  <template>
+    <!-- Fetch an array of users to be shown in the grid -->
+       <iron-ajax auto url="https://demo.vaadin.com/demo-data/1.0/people?count={{count}}" handle-as="json" last-response="{{users}}"></iron-ajax>
+       <div style="margin-bottom: 20px">
+          <paper-input id="firstname" placeholder="Count" value={{count}}></paper-input>
+             <input id="firstname" placeholder="First Name">
+             <input id="lastname" placeholder="Last Name">
+             <button on-tap="_add">Add</button>
+           </div>
+       <!-- The array is set as the <vaadin-grid>'s "items" property -->
+       <vaadin-grid aria-label="Basic Binding Example" items="[[users.result]]">
+
+
+
+         <vaadin-grid-column>
+           <template class="header">First Name</template>
+           <template><input id="first-[[index]]" value="[[item.firstName]]" on-input="_storeFirst" readonly$="[[!_isEditing(editing, item)]]"></template>
+           <template class="footer">First Name</template>
+         </vaadin-grid-column>
+
+         <vaadin-grid-column>
+           <template class="header">Last Name</template>
+           <template>  <input value="[[item.lastName]]" on-input="_storeLast" readonly$="[[!_isEditing(editing, item)]]"></template>
+           <template class="footer">Last Name</template>
+         </vaadin-grid-column>
+
+         <vaadin-grid-column>
+          <template>
+            <div style="display: flex">
+              <button hidden="[[editing]]" on-tap="_edit" focus-target$="[[!editing]]">Edit</button>
+              <button hidden="[[editing]]" on-tap="_remove">Remove</button>
+              <button hidden="[[!_isEditing(editing, item)]]" on-tap="_save" focus-target$="[[editing]]">Save</button>
+              <button hidden="[[!_isEditing(editing, item)]]" on-tap="_cancel">Cancel</button>
+            </div>
+          </template>
+        </vaadin-grid-column>
+
+       </vaadin-grid>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'vaadin-crud',
+      properties: {
+         editing: Object,
+         count:{
+           type:Number,
+           value:5,
+           notify:true
+         }
+       },
+
+       ready: function() {
+         this.editing = null;
+       },
+
+       _storeFirst: function(e) {
+         this._first = e.target.value;
+       },
+
+       _storeLast: function(e) {
+         this._last = e.target.value;
+       },
+
+       _isEditing: function(editing, item) {
+         return item === editing;
+       },
+
+       _edit: function(e) {
+         var item = e.model.item;
+         this.editing = item;
+
+         this._first = item.firstName;
+         this._last = item.lastName;
+
+         this.$.grid.querySelector('#first-' + e.model.index).focus();
+       },
+
+       _save: function(e) {
+         var item = e.model.item;
+         item.firstName = this._first;
+         item.lastName = this._last;
+
+         this.editing = null;
+
+         this.$.grid.clearCache();
+       },
+
+       _cancel: function() {
+         this.editing = null;
+
+         this.$.grid.clearCache();
+       },
+
+       _add: function(e) {
+         if (this.$.firstName.value !== '' && this.$.lastName.value !== '') {
+           this.items.unshift({firstName: this.$.firstName.value, lastName: this.$.lastName.value});
+           this.$.grid.clearCache();
+
+           this.$.firstname.value = '';
+           this.$.lastname.value = '';
+         } else {
+           alert('First Name and Last Name required');
+         }
+       },
+
+       _remove: function(e) {
+         var index = this.items.indexOf(e.model.item);
+         this.items.splice(index, 1);
+
+         this.$.grid.clearCache();
+       }
+      });
+  </script>
+</dom-module>

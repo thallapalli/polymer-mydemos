@@ -1,0 +1,54 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+
+<dom-module id="vaadin-twoway">
+  <template>
+  <style is="custom-style">
+      input[readonly] {
+        border: 2px solid transparent;
+      }
+
+      input {
+        font: inherit;
+      }
+    </style>
+
+  <iron-ajax auto url="https://demo.vaadin.com/demo-data/1.0/people?count=200" handle-as="json" last-response="{{users}}"></iron-ajax>
+<paper-checkbox checked="{{editing}}" style="margin-bottom: 20px">Enable Editing</paper-checkbox>
+    <vaadin-grid id ="grid"   items="{{users.result}}">
+    <vaadin-grid-column>
+      <template class="header">First Name</template>
+
+      <template><input id="first-[[index]]" value="{{item.firstName::input}}" readonly$="[[!editing]]" ></template>
+      <template class="footer">First Name</template>
+    </vaadin-grid-column>
+
+    <vaadin-grid-column>
+      <template class="header">Last Name</template>
+      <template><input value="{{item.lastName::input}}" readonly$="[[!editing]]"></template>
+      <template class="footer">Last Name</template>
+    </vaadin-grid-column>
+
+  </vaadin-grid>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'vaadin-twoway'
+              });
+  </script>
+</dom-module>
