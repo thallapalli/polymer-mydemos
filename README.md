@@ -12,6 +12,7 @@ navigation by pre-caching the remaining components required by the app and
 progressively loading them on-demand as the user navigates through the app.
 
 The PRPL pattern, in a nutshell:
+Heelo
 
 * **Push** components required for the initial route
 * **Render** initial route ASAP
